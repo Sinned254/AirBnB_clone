@@ -11,7 +11,7 @@ set -x
 cat > "${ROOTDIR}/AUTHORS" <<- EOF
 	# File @generated 
 	# This file lists all contributors to the repository.
-	# See hack/generate-authors.sh to make modifications.
+	# See hack/gen_aut to make modifications.
 
 	$(git -C "$ROOTDIR" log --format='%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)
 EOF
