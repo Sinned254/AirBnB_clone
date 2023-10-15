@@ -5,6 +5,13 @@ entry point to the interpreter
 import cmd
 from models import storage
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+SUPPORTED_CLASSES = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]
 
 
 class HBNBCommand(cmd.Cmd):
@@ -17,95 +24,85 @@ class HBNBCommand(cmd.Cmd):
         if not arg:
             print("** class name missing **")
             return
-        try:
-            new_instance = BaseModel()
-            new_instance.save()
-            print(new_instance.id)
-        except Exception:
+        class_name, *rest = arg.split(" ")
+        
+        if class_name not in SUPPORTED_CLASSES:
             print("** class doesn't exist **")
+            return
+        new_instance = eval(class_name)()
+        new_instance.save()
+        print(new_instance.id)
 
     def do_show(self, arg):
         """Print the string representation of an instance"""
         args = arg.split()
         if not arg:
             print("** class name missing **")
-            return
-        try:
-            class_name = args[0]
-            if len(args) < 2:
-                print("** instance id missing **")
-                return
-            obj_id = args[1]
-            all_objs = storage.all()
-            key = "{}.{}".format(class_name, obj_id)
-            if key in all_objs:
-                print(all_objs[key])
+        elif args[0] not in SUPPORTED_CLASSES:
+            print("** class doesn't exist **")
+        elif len(args) < 2:
+            print("** instance id missing **")
+        else:
+            objs = storage.all()
+            key = "{}.{}".format(args[0], args[1])
+            if key in objs:
+                print(objs[key])
             else:
                 print("** no instance found **")
-        except Exception:
-            print("** class doesn't exist **")
 
     def do_destroy(self, arg):
         """Delete an instance based on the class name and id"""
         args = arg.split()
         if not arg:
             print("** class name missing **")
-            return
-        try:
-            class_name = args[0]
-            if len(args) < 2:
-                print("** instance id missing **")
-                return
-            obj_id = args[1]
-            all_objs = storage.all()
-            key = "{}.{}".format(class_name, obj_id)
-            if key in all_objs:
-                del all_objs[key]
+        elif args[0] not in SUPPORTED_CLASSES:
+            print("** class doesn't exist **")
+        elif len(args) < 2:
+            print("** instance id missing **")
+        else:
+            objs = storage.all()
+            key = "{}.{}".format(args[0], args[1])
+            if key in objs:
+                del objs[key]
                 storage.save()
             else:
                 print("** no instance found **")
-        except Exception:
-            print("** class doesn't exist **")
 
     def do_all(self, arg):
         """Print string representations of all instances"""
         args = arg.split()
         all_objs = storage.all()
-        if not arg or args[0] in ["BaseModel", "User", "Place",
-                                  "State", "City", "Amenity", "Review"]:
+        if not arg:
             print([str(all_objs[key]) for key in all_objs])
-        else:
+        elif args[0] not in SUPPORTED_CLASSES:
             print("** class doesn't exist **")
+        else:
+            print([str(all_objs[key]) for key in
+                  all_objs if key.startswith(args[0])])
 
     def do_update(self, arg):
-        """Update an instance based on the class name and id"""
+        """Update an instance based on the class name and id by
+        adding  or updating attribute"""
         args = arg.split()
         if not arg:
             print("** class name missing **")
-            return
-        try:
-            class_name = args[0]
-            if len(args) < 2:
-                print("** instance id missing **")
-                return
-            obj_id = args[1]
-            all_objs = storage.all()
-            key = "{}.{}".format(class_name, obj_id)
-            if key in all_objs:
-                if len(args) < 3:
-                    print("** attribute name missing **")
-                elif len(args) < 4:
-                    print("** value missing **")
-                else:
-                    attribute_name = args[2]
-                    attribute_value = args[3]
-                    obj = all_objs[key]
-                    setattr(obj, attribute_name, attribute_value)
-                    obj.save()
+        elif args[0] not in SUPPORTED_CLASSES:
+            print("** class doesn't exist **")
+        elif len(args) < 2:
+            print("** instance id missing **")
+        elif len(args) < 3:
+            print("** attribute name missing **")
+        elif len(args) < 4:
+            print("** value missing **")
+        else:
+            objs = storage.all()
+            key = "{}.{}".format(args[0], args[1])
+            if key in objs:
+                obj = objs[key]
+                setattr(obj, args[2], args[3])
+                storage.save()
             else:
                 print("** no instance found **")
-        except Exception:
-            print("** class doesn't exist **")
 
     def do_quit(self, arg):
         """Command to Exit program"""
@@ -117,6 +114,25 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         pass
+
+    """def do_destroyall(self, arg):
+        
+        Deletes all instances of a class
+        Usage: destroyall <class name>
+        
+        if not arg:
+            print("** class name missing **")
+            return
+
+        class_name, *rest = arg.split(" ")
+        if class_name not in SUPPORTED_CLASSES:
+            print("** class doesn't exist **")
+        else:
+            instances = storage.all()
+            for obj_id, obj in list(instances.items()):
+                if obj.__class__.__name__ == class_name:
+                    del instances[obj_id]
+                    storage.save()"""
 
 
 if __name__ == '__main__':

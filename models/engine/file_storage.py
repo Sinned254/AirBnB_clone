@@ -4,6 +4,12 @@ instances to a JSON file and deserializes JSON file to instances:
 """
 from models.base_model import BaseModel
 import json
+from models.user import User
+from models.place import Place
+from models.amenity import Amenity
+from models.review  import Review
+from models.city import City
+from models.state import State
 
 
 class FileStorage:
@@ -23,9 +29,12 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns the dictionary __objects"""
-        return FileStorage.__objects
+        if cls is None:
+            return self.__objects
+        else:
+            return {k: v for k, v in self.__objects.items() if isinstance(v, cls)}
 
     def new(self, obj):
         """Sets in __objects the obj with key <obj class name>.id."""
