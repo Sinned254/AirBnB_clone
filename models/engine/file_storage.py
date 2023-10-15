@@ -29,12 +29,9 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self, cls=None):
+    def all(self):
         """Returns the dictionary __objects"""
-        if cls is None:
-            return self.__objects
-        else:
-            return {k: v for k, v in self.__objects.items() if isinstance(v, cls)}
+        return self.__objects
 
     def new(self, obj):
         """Sets in __objects the obj with key <obj class name>.id."""
@@ -57,14 +54,11 @@ class FileStorage:
         If the file doesn’t exist, no exception should be raised.
         """
         try:
-            with open(FileStorage.__file_path, 'r', encoding='utf-8') as file:
-                serialized_objects = json.load(file)
-
-            for key, serialized_obj in serialized_objects.items():
-                class_name, obj_id = key.split('.')
-                obj_cls = eval(class_name)
-                new_obj = obj_cls(**serialized_obj)
-                self.new(new_obj)
+            with open(self.__file_path, 'r', encoding='utf-8') as f:
+                json_dict = json.load(f)
+                for obj_dict in json_dict.values():
+                    cls = obj_dict['__class__']
+                    self.new(eval('{}({})'.format(cls, '**obj_dict')))
 
         except FileNotFoundError:
             pass

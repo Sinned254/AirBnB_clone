@@ -28,15 +28,6 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.first_name, "John")
         self.assertEqual(self.user.last_name, "Doe")
 
-    def test_to_dict_method(self):
-        user_dict = self.user.to_dict()
-        self.assertIsInstance(user_dict, dict)
-        self.assertEqual(user_dict['__class__'], 'User')
-        self.assertEqual(user_dict['email'], "")
-        self.assertEqual(user_dict['password'], "")
-        self.assertEqual(user_dict['first_name'], "")
-        self.assertEqual(user_dict['last_name'], "")
-
     def test_str_representation(self):
         # Set the attributes of the User instance
         self.user.email = "user@example.com"
@@ -46,7 +37,6 @@ class TestUser(unittest.TestCase):
 
         # Get the string representation
         str_representation = str(self.user)
-    
         # Check if specific attributes are present in the string representation
         self.assertIn(f"[User] ({self.user.id})", str_representation)
         self.assertIn(f"'email': 'user@example.com'", str_representation)

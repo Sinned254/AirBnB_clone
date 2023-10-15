@@ -11,7 +11,8 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
-SUPPORTED_CLASSES = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]
+SUPPORTED_CLASSES = ["BaseModel", "User", "State",
+                     "City", "Amenity", "Place", "Review"]
 
 
 class HBNBCommand(cmd.Cmd):
@@ -25,7 +26,6 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name, *rest = arg.split(" ")
-        
         if class_name not in SUPPORTED_CLASSES:
             print("** class doesn't exist **")
             return
@@ -116,10 +116,8 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     """def do_destroyall(self, arg):
-        
         Deletes all instances of a class
         Usage: destroyall <class name>
-        
         if not arg:
             print("** class name missing **")
             return
